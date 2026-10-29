@@ -1,0 +1,92 @@
+{
+  "uc3m": {
+    "file": "weights/uc3m.pt",
+    "dataset": "UC3M-LP",
+    "label": "license plate",
+    "input": [
+      256,
+      192
+    ],
+    "stride": [
+      2,
+      8
+    ],
+    "bytes": 426210,
+    "sha256": "acb05e89bceb9b05c5c44b6156092cddf7c1b943a523955faf0e8c23a278dbdf"
+  },
+  "gtsdb": {
+    "file": "weights/gtsdb.pt",
+    "dataset": "GTSDB",
+    "label": "prohibitory traffic sign",
+    "input": [
+      256,
+      192
+    ],
+    "stride": [
+      4,
+      4
+    ],
+    "bytes": 426615,
+    "sha256": "38f8b0d7eab8d6523a1b38d4a9f5a9375a9812639a138cef4a9f6955d52cc44b"
+  },
+  "shwd": {
+    "file": "weights/shwd.pt",
+    "dataset": "SHWD",
+    "label": "safety helmet",
+    "input": [
+      256,
+      192
+    ],
+    "stride": [
+      4,
+      4
+    ],
+    "bytes": 426210,
+    "sha256": "083d0ba96af78707f1b487b34b79a4d7d9f26ba31acdee7c576e40104e559eca"
+  },
+  "ccpd": {
+    "file": "weights/ccpd.pt",
+    "dataset": "CCPD2019",
+    "label": "license plate",
+    "input": [
+      256,
+      192
+    ],
+    "stride": [
+      2,
+      8
+    ],
+    "bytes": 426210,
+    "sha256": "c046a4e5cf17be425b109c9fc7be1183db8dd2728d2fd43acad6aff0e78ead9b"
+  },
+  "drone": {
+    "file": "weights/drone.pt",
+    "dataset": "Drone",
+    "label": "drone",
+    "input": [
+      256,
+      192
+    ],
+    "stride": [
+      4,
+      4
+    ],
+    "bytes": 426551,
+    "sha256": "dd9461bdc0ac7dac1175bfd1b5e46fd05148079e8ffb9166e8bf35af1d16ad68"
+  },
+  "amlpr": {
+    "file": "weights/amlpr.pt",
+    "dataset": "AMLPR",
+    "label": "license plate",
+    "input": [
+      256,
+      192
+    ],
+    "stride": [
+      2,
+      8
+    ],
+    "bytes": 426551,
+    "sha256": "3bb1ea3ce03d37a6848fbfdd2637ae879cb71bcba0cc07d12f8b35d09c352508"
+  }
+}
