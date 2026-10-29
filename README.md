@@ -45,7 +45,7 @@ All included weights are **final seed-0 checkpoints** from the reported training
 | [`drone.pt`](weights/drone.pt) | Drone | drone | 4 × 4 |
 | [`amlpr.pt`](weights/amlpr.pt) | AMLPR | license plate | 2 × 8 |
 
-The dataset name identifies the training domain; three plate checkpoints are separate models trained on different images. Choose the checkpoint closest to the images you expect. These are floating-point PyTorch weights. They are not directly loadable by ESP32-S3 firmware; the INT8 C runtime and firmware live in the [research repository](https://github.com/Aqshalikhsan/esp32/tree/main/firmware/mergdet_int8).
+The dataset name identifies the training domain; three plate checkpoints are separate models trained on different images. Choose the checkpoint closest to the images you expect. These are floating-point PyTorch weights. They are not directly loadable by ESP32-S3 firmware; device deployment requires the separately quantized INT8 program and C runtime.
 
 ## Train on your data
 
