@@ -2,7 +2,7 @@
 
 **AKROS** is a compact, single-class object detector designed for microcontroller deployment. It uses fixed image-gradient features, residual convolution blocks, three-scale fusion, and separate confidence and box heads. The network has **81,403 parameters**. A checkpoint detects one target class; use a different checkpoint for a different class.
 
-This repository provides six ready-to-use PyTorch checkpoints, an image inference API and CLI, and the training code. Input is grayscale, letterboxed to **256 × 192** pixels. AKROS outputs bounding boxes, not text recognition.
+This repository provides **18 ready-to-use PyTorch checkpoints** (six datasets × three seeds), an image inference API and CLI, and the training code. Input is grayscale, letterboxed to **256 × 192** pixels. AKROS outputs bounding boxes, not text recognition.
 
 ## Quick start
 
@@ -34,7 +34,7 @@ The coordinates are pixels in the original image after EXIF orientation is appli
 
 ## Model zoo
 
-All included weights are **final seed-0 checkpoints** from the reported training runs. The complete training state was stripped; each file contains model tensors and the metadata required for inference. The `weights/manifest.json` file records SHA-256 hashes.
+All included weights are **final checkpoints** from the reported three-seed training runs. The top-level weights are seed 0; seed 1 and 2 are in `weights/seeds/`. The complete training state was stripped; each file contains model tensors and the metadata required for inference. The `weights/manifest.json` file records SHA-256 hashes.
 
 | Weights | Training dataset | Detects | Output stride |
 |---|---|---|---|
@@ -44,6 +44,8 @@ All included weights are **final seed-0 checkpoints** from the reported training
 | [`ccpd.pt`](weights/ccpd.pt) | CCPD2019 | license plate | 2 × 8 |
 | [`drone.pt`](weights/drone.pt) | Drone | drone | 4 × 4 |
 | [`amlpr.pt`](weights/amlpr.pt) | AMLPR | license plate | 2 × 8 |
+
+For example, use `weights/seeds/uc3m_seed1.pt` or `weights/seeds/uc3m_seed2.pt` to select another UC3M seed. The same naming convention applies to every dataset.
 
 The dataset name identifies the training domain; three plate checkpoints are separate models trained on different images. Choose the checkpoint closest to the images you expect. These are floating-point PyTorch weights. They are not directly loadable by ESP32-S3 firmware; device deployment requires the separately quantized INT8 program and C runtime.
 
@@ -62,4 +64,4 @@ Please cite the AKROS paper when it becomes available. The datasets remain subje
 
 ## License
 
-Code and the six AKROS weight files are released under the [MIT License](LICENSE). Third-party datasets are excluded.
+Code and the 18 AKROS weight files are released under the [MIT License](LICENSE). Third-party datasets are excluded.
