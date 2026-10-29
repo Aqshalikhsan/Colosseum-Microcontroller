@@ -1,4 +1,22 @@
-# AKROS
+![AKROS: object detection for microcontrollers](assets/akros_banner.svg)
+
+<p align="center">
+  Compact object detection for microcontrollers, with reproducible training and benchmarks.
+</p>
+
+<p align="center">
+  <a href="#quick-start"><img alt="Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&amp;logoColor=white"></a>
+  <a href="#model-zoo"><img alt="PyTorch models" src="https://img.shields.io/badge/PyTorch-models-EE4C2C?logo=pytorch&amp;logoColor=white"></a>
+  <a href="#benchmarks"><img alt="ESP32-S3 benchmark" src="https://img.shields.io/badge/ESP32--S3-benchmark-00979D?logo=espressif&amp;logoColor=white"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/License-MIT-2DA44E"></a>
+</p>
+
+<p align="center">
+  <a href="#quick-start">🚀 Quick start</a> &nbsp;·&nbsp;
+  <a href="#model-zoo">🧠 Models</a> &nbsp;·&nbsp;
+  <a href="#benchmarks">📊 Benchmarks</a> &nbsp;·&nbsp;
+  <a href="#train-on-your-data">🛠️ Train on your data</a>
+</p>
 
 **AKROS** is a compact, single-class object detector designed for microcontroller deployment. It uses fixed image-gradient features, residual convolution blocks, three-scale fusion, and separate confidence and box heads. The network has **81,403 parameters**. A checkpoint detects one target class; use a different checkpoint for a different class.
 
