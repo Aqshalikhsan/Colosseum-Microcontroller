@@ -44,7 +44,7 @@ def main() -> None:
         choices=(
             "plate", "face", "traffic_sign", "pcb_defect", "barcode",
             "infrared_target", "animal", "helmet", "platelet", "traffic_light",
-            "speech_bubble", "drone", "pothole", "traffic_cone",
+            "speech_bubble", "drone", "pothole", "traffic_cone", "custom",
         ),
         default="plate",
     )

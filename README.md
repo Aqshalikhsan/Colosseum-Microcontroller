@@ -49,9 +49,32 @@ For example, use `weights/seeds/uc3m_seed1.pt` or `weights/seeds/uc3m_seed2.pt` 
 
 The dataset name identifies the training domain; three plate checkpoints are separate models trained on different images. Choose the checkpoint closest to the images you expect. These are floating-point PyTorch weights. They are not directly loadable by ESP32-S3 firmware; device deployment requires the separately quantized INT8 program and C runtime.
 
+## Benchmarks
+
+The plots below reproduce the **initial matched comparisons** in the paper: validation mean and sample SD across three seeds. The separate SHWD and Drone reruns changed two narrow initial rankings; see the paper before interpreting those datasets. The [accuracy data](assets/benchmark_results.csv), [device data](assets/benchmark_device.csv), and [plot script](scripts/plot_benchmark.py) are included.
+
+![Float validation AP50, AP75, and AP50:95 across six datasets](assets/benchmark_float.png)
+
+![Post-training INT8 validation AP50, AP75, and AP50:95 across six datasets](assets/benchmark_int8.png)
+
+The device comparison below is for **UC3M seed 0** on a 240 MHz ESP32-S3 with an embedded frame. Training throughput is a separate RTX 5060 pilot, not a device speed measurement.
+
+![UC3M training throughput and ESP32-S3 deployment measurements](assets/benchmark_device.png)
+
+The following paper figure shows selected **validation examples**, not aggregate performance. Green boxes are targets; red boxes are the top prediction when present.
+
+![Qualitative validation examples for AKROS and three baselines](assets/qualitative_results.png)
+
 ## Train on your data
 
-AKROS uses YOLO-format single-class annotations. See [training instructions](docs/TRAINING.md) for the directory layout, `data.yaml`, initial training, and score-alignment continuation. Raw datasets and official test images are not included here.
+AKROS uses YOLO-format single-class annotations. For a new dataset, put images and labels in `images/train`, `images/val`, `labels/train`, and `labels/val`, then make a `data.yaml`. One command trains both stages and packages weights:
+
+```bash
+python train.py --data my_dataset/data.yaml --name my_object --label "my object" --grid 4x4
+python predict.py --weights runs/custom/my_object/seed0/akros.pt --source path/to/image.jpg
+```
+
+The script computes box-size priors from training labels only. Use `--grid 2x8` for elongated horizontal targets, `--seeds 0 1 2` for three runs, and `--source-class N` when the target's YOLO class ID is not zero. See the [full custom-training guide](docs/TRAINING.md) for the dataset layout, options, and manual commands. Raw datasets and official test images are not included here.
 
 ## Reproducibility
 

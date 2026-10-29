@@ -1,4 +1,6 @@
-# Training AKROS on a single-class dataset
+# Training AKROS on a new dataset
+
+AKROS learns **one target class per checkpoint**. You can train it for plates, helmets, signs, or another object type using your own images and YOLO-format box annotations. The quick command below starts from random initialization, trains with a hard score target, continues with IoU-aligned scores, and writes a compact inference checkpoint.
 
 The training script expects ordinary YOLO labels, one line per object:
 
@@ -6,7 +8,7 @@ The training script expects ordinary YOLO labels, one line per object:
 0 center_x center_y width height
 ```
 
-Coordinates are normalized to the original image size. Images without objects may have an empty or absent label file. A dataset may use a different source class ID; pass `--source-class` to map that class to AKROS class 0.
+Coordinates are normalized to the original image size, each in the range 0–1. Images without objects may have an empty or absent label file. A dataset may use a different source class ID; pass `--source-class` to select that class. Other classes are ignored.
 
 ```text
 my_dataset/
@@ -25,13 +27,41 @@ val: images/val
 names: [object]
 ```
 
-The typical normalized object width and height should be estimated from **training labels only** and passed as `--prior-width` and `--prior-height`. The values below are an example for a plate dataset; change them for your dataset. Use `2x8` for horizontally elongated objects or `4x4` for more balanced object shapes. These are architecture choices, not a guarantee that one grid wins on every dataset.
+Run from the repository root:
+
+```bash
+python train.py --data my_dataset/data.yaml --name my_object \
+  --label "my object" --grid 4x4
+```
+
+The script calculates median normalized width and height **from training boxes only**, after applying the same letterbox geometry used by the model. Choose `2x8` for horizontally elongated targets or `4x4` for more balanced shapes. The grid choice should be fixed before evaluating the result. Training uses CUDA when available and otherwise runs on CPU.
+
+The default is one seed, 300 initial epochs and 20 score-alignment epochs. To run three seeds or change the budget:
+
+```bash
+python train.py --data my_dataset/data.yaml --name my_object \
+  --label "my object" --grid 4x4 --seeds 0 1 2 \
+  --base-epochs 300 --score-epochs 20 --batch-size 32
+```
+
+For a dataset whose target is class 2, add `--source-class 2`. To supply your own priors, pass **both** `--prior-width` and `--prior-height`. For a smaller initial trial, lower `--base-epochs` and `--score-epochs`; that changes the training recipe.
+
+Each seed produces `runs/custom/my_object/seedN/akros.pt`. For inference:
+
+```bash
+python predict.py --weights runs/custom/my_object/seed0/akros.pt \
+  --source path/to/image.jpg
+```
+
+## Manual training commands
+
+The commands below expose the underlying two-stage training script. The prior values are **an example for a plate dataset**; estimate them from your own training set or use the quick command above. Use `2x8` for this plate example and change `--task`, `--output-stride`, and the priors as needed.
 
 Initial training:
 
 ```bash
 python -m src.train_platedet \
-  --data my_dataset/data.yaml --task plate \
+  --data my_dataset/data.yaml --task custom \
   --architecture mergdet_m --model-size V5A --merg-block regular \
   --gradient-mode fixed --merg-fusion-mode multiscale \
   --height 192 --width 256 --output-stride 2x8 \
@@ -45,7 +75,7 @@ Score-alignment continuation:
 
 ```bash
 python -m src.train_platedet \
-  --data my_dataset/data.yaml --task plate \
+  --data my_dataset/data.yaml --task custom \
   --architecture mergdet_m --model-size V5A --merg-block regular \
   --gradient-mode fixed --merg-fusion-mode multiscale \
   --height 192 --width 256 --output-stride 2x8 \
