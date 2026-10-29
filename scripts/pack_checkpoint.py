@@ -1,4 +1,4 @@
-"""Strip a training checkpoint to a portable AKROS inference checkpoint."""
+"""Strip a training checkpoint to a portable Colosseum inference checkpoint."""
 
 from __future__ import annotations
 
@@ -17,9 +17,9 @@ def main() -> None:
     args = parser.parse_args()
     source = torch.load(args.input, map_location="cpu", weights_only=True)
     if source.get("architecture") != "MERG-Det-M":
-        parser.error("Expected an AKROS-compatible training checkpoint")
+        parser.error("Expected a Colosseum-compatible training checkpoint")
     if source.get("model_size") != "V5A" or source.get("merg_block") != "regular":
-        parser.error("Expected the AKROS architecture and regular blocks")
+        parser.error("Expected the Colosseum architecture and regular blocks")
     if source.get("geometry_mode") != "prior_log":
         parser.error("Expected prior_log box geometry")
     config = source.get("training_config") or {}
@@ -28,7 +28,7 @@ def main() -> None:
     if config.get("merg_fusion_mode", "multiscale") != "multiscale":
         parser.error("Expected multiscale fusion")
     compact = {
-        "architecture": "AKROS",
+        "architecture": "Colosseum",
         "format_version": 1,
         "label": args.label,
         "dataset": args.dataset,

@@ -1,4 +1,4 @@
-![AKROS: object detection for microcontrollers](assets/akros_banner.svg)
+![Colosseum: object detection for microcontrollers](assets/colosseum_banner.svg)
 
 <p align="center">
   Compact object detection for microcontrollers, with reproducible training and benchmarks.
@@ -18,17 +18,17 @@
   <a href="#train-on-your-data">🛠️ Train on your data</a>
 </p>
 
-**AKROS** is a compact, single-class object detector designed for microcontroller deployment. It uses fixed image-gradient features, residual convolution blocks, three-scale fusion, and separate confidence and box heads. The network has **81,403 parameters**. A checkpoint detects one target class; use a different checkpoint for a different class.
+**Colosseum** is a compact, single-class object detector designed for microcontroller deployment. It uses fixed image-gradient features, residual convolution blocks, three-scale fusion, and separate confidence and box heads. The network has **81,403 parameters**. A checkpoint detects one target class; use a different checkpoint for a different class.
 
-This repository provides **18 ready-to-use PyTorch checkpoints** (six datasets × three seeds), an image inference API and CLI, and the training code. Input is grayscale, letterboxed to **256 × 192** pixels. AKROS outputs bounding boxes, not text recognition.
+This repository provides **18 ready-to-use PyTorch checkpoints** (six datasets × three seeds), an image inference API and CLI, and the training code. Input is grayscale, letterboxed to **256 × 192** pixels. Colosseum outputs bounding boxes, not text recognition.
 
 ## Quick start
 
 Tested with Python 3.11.
 
 ```bash
-git clone https://github.com/Aqshalikhsan/AKROS.git
-cd AKROS
+git clone https://github.com/Aqshalikhsan/Colosseum.git
+cd Colosseum
 python -m venv .venv
 # Windows: .venv\Scripts\activate
 # Linux/macOS: source .venv/bin/activate
@@ -41,9 +41,9 @@ Annotated images and machine-readable `predictions.json` are written to `runs/pr
 Python API:
 
 ```python
-from akros import AKROS
+from colosseum import Colosseum
 
-model = AKROS("weights/uc3m.pt")
+model = Colosseum("weights/uc3m.pt")
 for box in model.predict("path/to/image.jpg", conf=0.35):
     print(box.label, box.confidence, box.x1, box.y1, box.x2, box.y2)
 ```
@@ -81,15 +81,15 @@ The device comparison below is for **UC3M seed 0** on a 240 MHz ESP32-S3 with an
 
 The following paper figure shows selected **validation examples**, not aggregate performance. Green boxes are targets; red boxes are the top prediction when present.
 
-![Qualitative validation examples for AKROS and three baselines](assets/qualitative_results.png)
+![Qualitative validation examples for Colosseum and three baselines](assets/qualitative_results.png)
 
 ## Train on your data
 
-AKROS uses YOLO-format single-class annotations. For a new dataset, put images and labels in `images/train`, `images/val`, `labels/train`, and `labels/val`, then make a `data.yaml`. One command trains both stages and packages weights:
+Colosseum uses YOLO-format single-class annotations. For a new dataset, put images and labels in `images/train`, `images/val`, `labels/train`, and `labels/val`, then make a `data.yaml`. One command trains both stages and packages weights:
 
 ```bash
 python train.py --data my_dataset/data.yaml --name my_object --label "my object" --grid 4x4
-python predict.py --weights runs/custom/my_object/seed0/akros.pt --source path/to/image.jpg
+python predict.py --weights runs/custom/my_object/seed0/colosseum.pt --source path/to/image.jpg
 ```
 
 The script computes box-size priors from training labels only. Use `--grid 2x8` for elongated horizontal targets, `--seeds 0 1 2` for three runs, and `--source-class N` when the target's YOLO class ID is not zero. See the [full custom-training guide](docs/TRAINING.md) for the dataset layout, options, and manual commands. Raw datasets and official test images are not included here.
@@ -99,10 +99,10 @@ The script computes box-size priors from training labels only. Use `--grid 2x8` 
 - Input: grayscale, bilinear resize preserving aspect ratio, gray padding value 114.
 - Architecture: fixed-gradient stem, regular bottleneck blocks, multiscale fusion, one confidence channel and four geometry channels.
 - Geometry: normalized boxes with a prior-log width and height encoding; priors are saved in each checkpoint.
-- Files under `src/` retain some internal legacy names because they are also used by the training and checkpoint export pipeline. The public model name is AKROS.
+- Files under `src/` retain some internal legacy names because they are also used by the training and checkpoint export pipeline. The public model name is Colosseum.
 
-Please cite the AKROS paper when it becomes available. The datasets remain subject to their source terms; no raw dataset images are redistributed here.
+Please cite the Colosseum paper when it becomes available. The datasets remain subject to their source terms; no raw dataset images are redistributed here.
 
 ## License
 
-Code and the 18 AKROS weight files are released under the [MIT License](LICENSE). Third-party datasets are excluded.
+Code and the 18 Colosseum weight files are released under the [MIT License](LICENSE). Third-party datasets are excluded.

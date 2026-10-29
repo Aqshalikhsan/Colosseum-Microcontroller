@@ -1,4 +1,4 @@
-"""Train AKROS on a new one-class YOLO dataset and package inference weights."""
+"""Train Colosseum on a new one-class YOLO dataset and package inference weights."""
 
 from __future__ import annotations
 
@@ -108,7 +108,7 @@ def main() -> None:
                       "--epochs", str(args.score_epochs), "--learning-rate", "0.0001",
                       "--seed", str(seed), "--init-checkpoint", str(base_last),
                       "--output", str(final)])
-        compact = directory / "akros.pt"
+        compact = directory / "colosseum.pt"
         run([sys.executable, str(ROOT / "scripts" / "pack_checkpoint.py"),
              "--input", str(directory / "final_last.pt"), "--output", str(compact),
              "--label", args.label, "--dataset", args.name])

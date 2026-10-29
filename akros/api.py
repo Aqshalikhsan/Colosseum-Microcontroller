@@ -1,4 +1,4 @@
-"""Load an AKROS checkpoint and detect one class in ordinary images."""
+"""Load a Colosseum checkpoint and detect one class in ordinary images."""
 
 from __future__ import annotations
 
@@ -25,14 +25,14 @@ class Detection:
         return asdict(self)
 
 
-class AKROS:
+class Colosseum:
     """Single-class detector. Each checkpoint has its own target label."""
 
     def __init__(self, weights: str | Path, device: str = "cpu") -> None:
         self.device = torch.device(device)
         checkpoint = torch.load(weights, map_location="cpu", weights_only=True)
-        if checkpoint.get("architecture") != "AKROS":
-            raise ValueError("Expected a public AKROS checkpoint")
+        if checkpoint.get("architecture") not in {"Colosseum", "AKROS"}:
+            raise ValueError("Expected a public Colosseum checkpoint")
         self.label = str(checkpoint["label"])
         self.input_height = int(checkpoint["input_height"])
         self.input_width = int(checkpoint["input_width"])
@@ -86,3 +86,7 @@ class AKROS:
             if x2 > x1 and y2 > y1:
                 result.append(Detection(self.label, float(box.score), x1, y1, x2, y2))
         return result
+
+
+# Earlier public checkpoints and imports used the AKROS name.
+AKROS = Colosseum

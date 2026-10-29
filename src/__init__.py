@@ -1,1 +1,1 @@
-"""AKROS architecture and training components."""
+"""Colosseum architecture and training components."""

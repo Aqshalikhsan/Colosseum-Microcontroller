@@ -12,7 +12,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets"
 DATASETS = ["UC3M", "GTSDB", "SHWD", "CCPD", "Drone", "AMLPR"]
-MODELS = ["AKROS", "ESPDet-Pico", "Tinyissimo v8", "YOLOX-Nano"]
+MODELS = ["Colosseum", "ESPDet-Pico", "Tinyissimo v8", "YOLOX-Nano"]
 COLORS = ["#1769AA", "#DB8A23", "#32885C", "#9954A8"]
 METRICS = [("ap50", "AP50"), ("ap75", "AP75"), ("ap5095", "AP50:95")]
 

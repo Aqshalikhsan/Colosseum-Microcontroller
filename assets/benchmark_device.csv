@@ -1,5 +1,5 @@
 model,train_images_per_s,inference_ms,pipeline_ms,pipeline_sd_ms,arena_kib,firmware_kib
-AKROS,300.5,481.316,510.207,0.002,160.1,576.9
+Colosseum,300.5,481.316,510.207,0.002,160.1,576.9
 ESPDet-Pico,275.6,464.418,502.997,0.003,180.1,1076.6
 Tinyissimo v8,352.5,465.711,504.403,0.001,165.1,1509.5
 YOLOX-Nano,141.4,630.338,677.942,0.047,150.1,2213.9

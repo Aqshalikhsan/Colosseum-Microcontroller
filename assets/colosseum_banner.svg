@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title description">
+  <title id="title">Colosseum</title>
+  <desc id="description">Colosseum wordmark beside a stylized Roman amphitheatre with two rows of arches.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f8f5ef"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d8b787"/>
+      <stop offset="0.55" stop-color="#b8854c"/>
+      <stop offset="1" stop-color="#8a5c34"/>
+    </linearGradient>
+    <linearGradient id="letters" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#263044"/>
+      <stop offset="1" stop-color="#5a3f2f"/>
+    </linearGradient>
+    <clipPath id="facade">
+      <path d="M98 139C156 83 322 69 411 123V230C335 264 173 269 98 229Z"/>
+    </clipPath>
+    <path id="upper-arch" d="M0 0V-22A12 12 0 0 1 24-22V0Z"/>
+    <path id="lower-arch" d="M0 0V-29A14 14 0 0 1 28-29V0Z"/>
+  </defs>
+
+  <rect width="1200" height="300" rx="18" fill="url(#background)"/>
+  <circle cx="254" cy="150" r="136" fill="#f1e5d4" opacity="0.55"/>
+  <path d="M79 253H1115" stroke="#dfd3c4" stroke-width="1.5"/>
+
+  <path d="M98 139C156 83 322 69 411 123V230C335 264 173 269 98 229Z" fill="url(#stone)" stroke="#80552f" stroke-width="3"/>
+  <g clip-path="url(#facade)" fill="#55412f">
+    <use href="#upper-arch" x="113" y="174"/>
+    <use href="#upper-arch" x="148" y="174"/>
+    <use href="#upper-arch" x="183" y="174"/>
+    <use href="#upper-arch" x="218" y="174"/>
+    <use href="#upper-arch" x="253" y="174"/>
+    <use href="#upper-arch" x="288" y="174"/>
+    <use href="#upper-arch" x="323" y="174"/>
+    <use href="#upper-arch" x="358" y="174"/>
+    <use href="#lower-arch" x="109" y="238"/>
+    <use href="#lower-arch" x="145" y="238"/>
+    <use href="#lower-arch" x="181" y="238"/>
+    <use href="#lower-arch" x="217" y="238"/>
+    <use href="#lower-arch" x="253" y="238"/>
+    <use href="#lower-arch" x="289" y="238"/>
+    <use href="#lower-arch" x="325" y="238"/>
+    <use href="#lower-arch" x="361" y="238"/>
+  </g>
+  <path d="M98 179C170 192 328 197 411 179M98 244C171 260 327 259 411 237" fill="none" stroke="#efdbb8" stroke-width="7" opacity="0.8"/>
+  <path d="M98 139C156 83 322 69 411 123M98 148C168 97 328 85 411 132" fill="none" stroke="#f7e8ce" stroke-width="8" stroke-linecap="round"/>
+  <path d="M98 139C156 83 322 69 411 123V230C335 264 173 269 98 229Z" fill="none" stroke="#80552f" stroke-width="3"/>
+
+  <text x="465" y="180" fill="url(#letters)" font-family="Georgia, 'Times New Roman', serif" font-size="92" font-weight="700" letter-spacing="1">Colosseum</text>
+</svg>

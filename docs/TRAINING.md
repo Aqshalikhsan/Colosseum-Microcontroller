@@ -1,6 +1,6 @@
-# Training AKROS on a new dataset
+# Training Colosseum on a new dataset
 
-AKROS learns **one target class per checkpoint**. You can train it for plates, helmets, signs, or another object type using your own images and YOLO-format box annotations. The quick command below starts from random initialization, trains with a hard score target, continues with IoU-aligned scores, and writes a compact inference checkpoint.
+Colosseum learns **one target class per checkpoint**. You can train it for plates, helmets, signs, or another object type using your own images and YOLO-format box annotations. The quick command below starts from random initialization, trains with a hard score target, continues with IoU-aligned scores, and writes a compact inference checkpoint.
 
 The training script expects ordinary YOLO labels, one line per object:
 
@@ -46,10 +46,10 @@ python train.py --data my_dataset/data.yaml --name my_object \
 
 For a dataset whose target is class 2, add `--source-class 2`. To supply your own priors, pass **both** `--prior-width` and `--prior-height`. For a smaller initial trial, lower `--base-epochs` and `--score-epochs`; that changes the training recipe.
 
-Each seed produces `runs/custom/my_object/seedN/akros.pt`. For inference:
+Each seed produces `runs/custom/my_object/seedN/colosseum.pt`. For inference:
 
 ```bash
-python predict.py --weights runs/custom/my_object/seed0/akros.pt \
+python predict.py --weights runs/custom/my_object/seed0/colosseum.pt \
   --source path/to/image.jpg
 ```
 
@@ -86,7 +86,7 @@ python -m src.train_platedet \
   --output runs/my_object/final.pt
 ```
 
-The raw training checkpoint contains optimizer and training state. `akros.AKROS` expects the compact public format found under `weights/`; package your own checkpoint with:
+The raw training checkpoint contains optimizer and training state. `colosseum.Colosseum` expects the compact public format found under `weights/`; package your own checkpoint with:
 
 ```bash
 python scripts/pack_checkpoint.py --input runs/my_object/final_last.pt \

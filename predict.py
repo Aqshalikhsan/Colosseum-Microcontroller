@@ -1,4 +1,4 @@
-"""Command-line AKROS inference on an image or directory of images."""
+"""Command-line Colosseum inference on an image or directory of images."""
 
 from __future__ import annotations
 
@@ -8,14 +8,14 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageOps
 
-from akros import AKROS
+from colosseum import Colosseum
 
 
 SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="AKROS single-class image detection")
+    parser = argparse.ArgumentParser(description="Colosseum single-class image detection")
     parser.add_argument("--weights", type=Path, default=Path("weights/uc3m.pt"))
     parser.add_argument("--source", type=Path, required=True, help="image or directory")
     parser.add_argument("--output", type=Path, default=Path("runs/predict"))
@@ -30,7 +30,7 @@ def main() -> None:
     if not sources:
         parser.error("No supported images found in --source")
     args.output.mkdir(parents=True, exist_ok=True)
-    model = AKROS(args.weights, device=args.device)
+    model = Colosseum(args.weights, device=args.device)
     records = []
     for source in sources:
         detections = model.predict(source, conf=args.conf, max_det=args.max_det)
