@@ -1,5 +1,5 @@
 """Public Colosseum inference interface."""
 
-from akros.api import Colosseum, Detection
+from .api import Colosseum, Detection
 
 __all__ = ["Colosseum", "Detection"]
