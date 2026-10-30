@@ -27,12 +27,17 @@ def main() -> None:
     left = (canvas_width - row_width) // 2
     top = (canvas_height - tile_size) // 2
     font = ImageFont.truetype(str(font_path), 172)
-    image = Image.new("RGB", (canvas_width, canvas_height), "#FFFFFF")
+    image = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
 
     for index, letter in enumerate(LETTERS):
         x = left + index * (tile_size + gap)
-        draw.rectangle((x, top, x + tile_size - 1, top + tile_size - 1), fill=COLORS[index % len(COLORS)])
+        draw.rectangle(
+            (x, top, x + tile_size - 1, top + tile_size - 1),
+            fill=COLORS[index % len(COLORS)],
+            outline="#F3F5F7",
+            width=6,
+        )
         bbox = draw.textbbox((0, 0), letter, font=font)
         text_x = x + (tile_size - (bbox[2] - bbox[0])) / 2 - bbox[0]
         text_y = top + (tile_size - (bbox[3] - bbox[1])) / 2 - bbox[1]
