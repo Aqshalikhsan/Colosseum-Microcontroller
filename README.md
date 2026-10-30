@@ -1,4 +1,6 @@
-![Colosseum: object detection for microcontrollers](assets/colosseum_banner.svg)
+<p align="center">
+  <img src="assets/colosseum_banner.png" width="900" alt="Colosseum letter-tile logo">
+</p>
 
 <p align="center">
   Compact object detection for microcontrollers, with reproducible training and benchmarks.
