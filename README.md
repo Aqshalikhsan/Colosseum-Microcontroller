@@ -29,8 +29,8 @@ This repository provides **18 ready-to-use PyTorch checkpoints** (six datasets Ã
 Tested with Python 3.11.
 
 ```bash
-git clone https://github.com/Aqshalikhsan/Colosseum.git
-cd Colosseum
+git clone https://github.com/Aqshalikhsan/Colosseum-Microcontroller.git
+cd Colosseum-Microcontroller
 python -m venv .venv
 # Windows: .venv\Scripts\activate
 # Linux/macOS: source .venv/bin/activate
