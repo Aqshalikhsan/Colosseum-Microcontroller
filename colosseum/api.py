@@ -41,10 +41,13 @@ class Detection:
 
 
 class Colosseum:
-    """Single-class detector. Each checkpoint has its own target label."""
+    """Train a detector or load a single-class checkpoint for inference."""
 
-    def __init__(self, weights: str | Path, device: str = "cpu") -> None:
+    def __init__(self, weights: str | Path | None = None, device: str = "cpu") -> None:
         self.device = torch.device(device)
+        self.model = None
+        if weights is None:
+            return
         checkpoint = torch.load(_resolve_weights(weights), map_location="cpu", weights_only=True)
         if checkpoint.get("architecture") not in {"Colosseum", "AKROS"}:
             raise ValueError("Expected a public Colosseum checkpoint")
@@ -63,12 +66,42 @@ class Colosseum:
             prior_height=float(checkpoint["prior_height"]),
         )
 
+    def train(
+        self,
+        data: str | Path,
+        name: str,
+        label: str,
+        grid: str = "4x4",
+        *,
+        seeds: tuple[int, ...] = (0,),
+        base_epochs: int = 300,
+        score_epochs: int = 20,
+        batch_size: int = 32,
+        source_class: int = 0,
+        prior_width: float | None = None,
+        prior_height: float | None = None,
+        augment: bool = True,
+    ) -> list[Path]:
+        """Train from scratch, load the first seed, and return checkpoint paths."""
+        from .training import train
+
+        checkpoints = train(
+            data=data, name=name, label=label, grid=grid, seeds=seeds,
+            base_epochs=base_epochs, score_epochs=score_epochs,
+            batch_size=batch_size, source_class=source_class,
+            prior_width=prior_width, prior_height=prior_height, augment=augment,
+        )
+        self.__init__(checkpoints[0], device=str(self.device))
+        return checkpoints
+
     def predict(
         self, source: str | Path | Image.Image,
         conf: float = 0.35,
         max_det: int = 20,
     ) -> list[Detection]:
         """Return boxes in the original image's pixel coordinates."""
+        if self.model is None:
+            raise RuntimeError("Train this Colosseum model or load a checkpoint before prediction")
         if not 0.0 <= conf <= 1.0:
             raise ValueError("conf must be between 0 and 1")
         if max_det < 1:

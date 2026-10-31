@@ -16,7 +16,7 @@ SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="colosseum predict", description="Colosseum single-class image detection")
-    parser.add_argument("--weights", default="uc3m", help="bundled model name or checkpoint path")
+    parser.add_argument("--weights", required=True, help="trained checkpoint path or bundled example name")
     parser.add_argument("--source", type=Path, required=True, help="image or directory")
     parser.add_argument("--output", type=Path, default=Path("runs/predict"))
     parser.add_argument("--conf", type=float, default=0.35)

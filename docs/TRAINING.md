@@ -2,7 +2,7 @@
 
 Install with `python -m pip install git+https://github.com/Aqshalikhsan/Colosseum-Microcontroller.git`. The commands below also work from an editable source checkout (`python -m pip install -e .`).
 
-Colosseum learns **one target class per checkpoint**. You can train it for plates, helmets, signs, or another object type using your own images and YOLO-format box annotations. The quick command below starts from random initialization, trains with a hard score target, continues with IoU-aligned scores, and writes a compact inference checkpoint.
+Colosseum learns **one target class per checkpoint**. You can train it for plates, helmets, signs, or another object type using your own images and box annotations. The Python API starts from random initialization, trains with a hard score target, continues with IoU-aligned scores, and writes a compact inference checkpoint. The label text files use the common YOLO annotation format; the model and training code are Colosseum's own.
 
 The training script expects ordinary YOLO labels, one line per object:
 
@@ -29,7 +29,23 @@ val: images/val
 names: [object]
 ```
 
-Run from the repository root:
+Run from the folder where you want `runs/` to be written:
+
+```python
+from colosseum import Colosseum
+
+model = Colosseum()
+checkpoints = model.train(
+    data="my_dataset/data.yaml",
+    name="my_object",
+    label="my object",
+    grid="4x4",
+)
+print(checkpoints[0])
+boxes = model.predict("path/to/image.jpg")
+```
+
+The same training pipeline is also available as a command:
 
 ```bash
 colosseum train --data my_dataset/data.yaml --name my_object \
@@ -38,7 +54,7 @@ colosseum train --data my_dataset/data.yaml --name my_object \
 
 The script calculates median normalized width and height **from training boxes only**, after applying the same letterbox geometry used by the model. Choose `2x8` for horizontally elongated targets or `4x4` for more balanced shapes. The grid choice should be fixed before evaluating the result. Training uses CUDA when available and otherwise runs on CPU.
 
-The default is one seed, 300 initial epochs and 20 score-alignment epochs. To run three seeds or change the budget:
+The default is one seed, 300 initial epochs and 20 score-alignment epochs. In Python, pass `seeds=(0, 1, 2)`, `base_epochs=300`, `score_epochs=20`, and `batch_size=32` to `model.train(...)` to change these options. The equivalent CLI call is:
 
 ```bash
 colosseum train --data my_dataset/data.yaml --name my_object \

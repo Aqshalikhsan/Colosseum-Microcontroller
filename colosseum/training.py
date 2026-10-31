@@ -13,9 +13,6 @@ import yaml
 from ._core.plate_dataset import YoloPlateDataset
 
 
-ROOT = Path.cwd()
-
-
 def split_paths(data_file: Path, split: str) -> tuple[Path, Path]:
     config = yaml.safe_load(data_file.read_text(encoding="utf-8"))
     base = Path(config.get("path", data_file.parent))
@@ -42,12 +39,13 @@ def training_priors(data_file: Path, source_class: int) -> tuple[float, float, i
     return statistics.median(widths), statistics.median(heights), len(widths)
 
 
-def run(command: list[str]) -> None:
+def run(command: list[str], workdir: Path) -> None:
     print("$ " + " ".join(command), flush=True)
-    subprocess.run(command, cwd=ROOT, check=True)
+    subprocess.run(command, cwd=workdir, check=True)
 
 
-def main(argv: list[str] | None = None) -> None:
+def main(argv: list[str] | None = None) -> list[Path]:
+    workdir = Path.cwd()
     parser = argparse.ArgumentParser(prog="colosseum train", description=__doc__)
     parser.add_argument("--data", type=Path, required=True, help="YOLO data.yaml")
     parser.add_argument("--name", required=True, help="short output folder name")
@@ -96,23 +94,57 @@ def main(argv: list[str] | None = None) -> None:
     ]
     if not args.no_augment:
         common.append("--augment")
+    checkpoints = []
     for seed in args.seeds:
-        directory = ROOT / "runs" / "custom" / args.name / f"seed{seed}"
+        directory = workdir / "runs" / "custom" / args.name / f"seed{seed}"
         directory.mkdir(parents=True, exist_ok=True)
         base = directory / "base.pt"
         final = directory / "final.pt"
         run(common + ["--objectness-target", "hard", "--epochs", str(args.base_epochs),
-                      "--learning-rate", "0.002", "--seed", str(seed), "--output", str(base)])
+                      "--learning-rate", "0.002", "--seed", str(seed), "--output", str(base)], workdir)
         base_last = directory / "base_last.pt"
         run(common + ["--objectness-target", "iou", "--iou-weight", "1",
                       "--epochs", str(args.score_epochs), "--learning-rate", "0.0001",
                       "--seed", str(seed), "--init-checkpoint", str(base_last),
-                      "--output", str(final)])
+                      "--output", str(final)], workdir)
         compact = directory / "colosseum.pt"
         run([sys.executable, "-m", "colosseum.pack_checkpoint",
              "--input", str(directory / "final_last.pt"), "--output", str(compact),
-             "--label", args.label, "--dataset", args.name])
+             "--label", args.label, "--dataset", args.name], workdir)
         print(f"ready={compact}", flush=True)
+        checkpoints.append(compact)
+    return checkpoints
+
+
+def train(
+    data: str | Path,
+    name: str,
+    label: str,
+    grid: str = "4x4",
+    *,
+    seeds: tuple[int, ...] = (0,),
+    base_epochs: int = 300,
+    score_epochs: int = 20,
+    batch_size: int = 32,
+    source_class: int = 0,
+    prior_width: float | None = None,
+    prior_height: float | None = None,
+    augment: bool = True,
+) -> list[Path]:
+    """Train from scratch and return compact checkpoints, one for each seed."""
+    argv = [
+        "--data", str(data), "--name", name, "--label", label, "--grid", grid,
+        "--seeds", *(str(seed) for seed in seeds),
+        "--base-epochs", str(base_epochs), "--score-epochs", str(score_epochs),
+        "--batch-size", str(batch_size), "--source-class", str(source_class),
+    ]
+    if prior_width is not None:
+        argv.extend(["--prior-width", str(prior_width)])
+    if prior_height is not None:
+        argv.extend(["--prior-height", str(prior_height)])
+    if not augment:
+        argv.append("--no-augment")
+    return main(argv)
 
 
 if __name__ == "__main__":

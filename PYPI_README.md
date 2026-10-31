@@ -2,24 +2,32 @@
   <img src="https://raw.githubusercontent.com/Aqshalikhsan/Colosseum-Microcontroller/main/assets/colosseum_banner.png" width="900" alt="Colosseum letter-tile logo">
 </p>
 
-Colosseum is a compact single-class object detector designed for microcontroller deployment. The package provides PyTorch inference, a two-stage custom-training command, and 18 bundled checkpoints from six datasets and three seeds.
+Colosseum is a compact single-class object detection framework designed for microcontroller deployment. Install it to train a detector for your own target object. The package also includes 18 example checkpoints from six datasets and three seeds.
 
 ```bash
 python -m pip install colosseum-microcontroller
-colosseum predict --weights uc3m --source path/to/image.jpg
 ```
 
 ```python
 from colosseum import Colosseum
 
-model = Colosseum("uc3m")
+model = Colosseum()
+checkpoints = model.train(
+    data="my_dataset/data.yaml",
+    name="my_object",
+    label="my object",
+    grid="4x4",
+)
+print(checkpoints[0])
 boxes = model.predict("path/to/image.jpg")
 ```
 
-For a new single-class YOLO dataset:
+Training starts from scratch, saves a compact checkpoint under `runs/custom/my_object/seed0/`, and loads it for inference. One checkpoint detects one target class. Your dataset uses images and normalized bounding-box text annotations; see the [training guide](https://github.com/Aqshalikhsan/Colosseum-Microcontroller/blob/main/docs/TRAINING.md) for the layout.
+
+The command-line equivalent is:
 
 ```bash
 colosseum train --data my_dataset/data.yaml --name my_object --label "my object" --grid 4x4
 ```
 
-The bundled names are `uc3m`, `gtsdb`, `shwd`, `ccpd`, `drone`, and `amlpr`, plus `_seed1` and `_seed2` variants. You can also pass a path to your own compact checkpoint. See the [repository](https://github.com/Aqshalikhsan/Colosseum-Microcontroller) for benchmarks, dataset layout, and the full training guide. The bundled weights are floating-point PyTorch checkpoints; ESP32-S3 deployment uses the separate INT8 runtime.
+The bundled example names are `uc3m`, `gtsdb`, `shwd`, `ccpd`, `drone`, and `amlpr`, plus `_seed1` and `_seed2` variants. For inference you can pass either one of these names or the path to your own compact checkpoint. See the [repository](https://github.com/Aqshalikhsan/Colosseum-Microcontroller) for benchmarks. The weights are floating-point PyTorch checkpoints; ESP32-S3 deployment uses the separate INT8 runtime.

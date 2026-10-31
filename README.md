@@ -22,7 +22,7 @@
 
 **Colosseum** is a compact, single-class object detector designed for microcontroller deployment. It uses fixed image-gradient features, residual convolution blocks, three-scale fusion, and separate confidence and box heads. The network has **81,403 parameters**. A checkpoint detects one target class; use a different checkpoint for a different class.
 
-This repository provides **18 ready-to-use PyTorch checkpoints** (six datasets × three seeds), an image inference API and CLI, and the training code. Input is grayscale, letterboxed to **256 × 192** pixels. Colosseum outputs bounding boxes, not text recognition.
+Install Colosseum as a Python library to train a detector on your own images. The repository also provides **18 ready-to-use PyTorch checkpoints** (six datasets × three seeds) for examples and benchmarks. Input is grayscale, letterboxed to **256 × 192** pixels. Colosseum outputs bounding boxes, not text recognition.
 
 ## Quick start
 
@@ -30,19 +30,43 @@ Tested with Python 3.11. Install the package directly from this repository:
 
 ```bash
 python -m pip install git+https://github.com/Aqshalikhsan/Colosseum-Microcontroller.git
-colosseum predict --weights uc3m --source path/to/image.jpg
 ```
 
-The pip package includes all **18 checkpoints**, so a model name such as `uc3m`, `shwd`, or `uc3m_seed1` works without downloading another file. You can also pass a path to your own compact checkpoint. For a source checkout, use `python -m pip install -e .` to install the package in editable mode.
-
-Annotated images and machine-readable `predictions.json` are written to `runs/predict/`. Use `--source path/to/folder` for a folder of images, `--conf 0.25` to adjust the confidence cutoff, and `--device cuda:0` for a CUDA GPU.
-
-Python API:
+Create `my_dataset/data.yaml` and train your own detector from Python:
 
 ```python
 from colosseum import Colosseum
 
-model = Colosseum("uc3m")
+model = Colosseum()
+checkpoints = model.train(
+    data="my_dataset/data.yaml",
+    name="my_object",
+    label="my object",
+    grid="4x4",
+)
+print(checkpoints[0])  # runs/custom/my_object/seed0/colosseum.pt
+boxes = model.predict("path/to/image.jpg")
+```
+
+This trains the Colosseum network from scratch, loads the resulting checkpoint, and returns its path. Each checkpoint detects **one target class**. The dataset uses ordinary image files and text files with normalized box coordinates; the [training guide](docs/TRAINING.md) shows the exact layout. No Ultralytics package or YOLO model is used. For a source checkout, use `python -m pip install -e .` to install the library in editable mode.
+
+The equivalent command-line interface is:
+
+```bash
+colosseum train --data my_dataset/data.yaml --name my_object --label "my object" --grid 4x4
+colosseum predict --weights runs/custom/my_object/seed0/colosseum.pt --source path/to/image.jpg
+```
+
+The pip package also includes all **18 example checkpoints**, so a model name such as `uc3m`, `shwd`, or `uc3m_seed1` works without downloading another file. To try one, run `colosseum predict --weights uc3m --source path/to/image.jpg`.
+
+Annotated images and machine-readable `predictions.json` are written to `runs/predict/`. Use `--source path/to/folder` for a folder of images, `--conf 0.25` to adjust the confidence cutoff, and `--device cuda:0` for a CUDA GPU.
+
+To load a previously trained checkpoint in another script:
+
+```python
+from colosseum import Colosseum
+
+model = Colosseum("runs/custom/my_object/seed0/colosseum.pt")
 for box in model.predict("path/to/image.jpg", conf=0.35):
     print(box.label, box.confidence, box.x1, box.y1, box.x2, box.y2)
 ```
