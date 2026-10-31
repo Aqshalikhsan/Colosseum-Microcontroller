@@ -33,7 +33,7 @@ Tested with Python 3.11. Install the package from PyPI:
 python -m pip install colosseum-microcontroller
 ```
 
-[Open the training notebook in Google Colab](https://colab.research.google.com/github/Aqshalikhsan/Colosseum-Microcontroller/blob/main/notebooks/Train_Colosseum.ipynb) to upload your own dataset, train through the Python API, view validation metrics, and download the checkpoints.
+[Open the training notebook in Google Colab](https://colab.research.google.com/github/Aqshalikhsan/Colosseum-Microcontroller/blob/main/notebooks/Train_Colosseum.ipynb) to connect Google Drive, train on a dataset folder in My Drive, view validation metrics, and save every checkpoint directly to Drive.
 
 Create `my_dataset/data.yaml` and train your own detector from Python:
 
