@@ -83,6 +83,7 @@ class Colosseum:
         base_epochs: int = 300,
         score_epochs: int = 20,
         batch_size: int = 32,
+        progress_every_batches: int = 10,
         source_class: int = 0,
         prior_width: float | None = None,
         prior_height: float | None = None,
@@ -94,7 +95,8 @@ class Colosseum:
         checkpoints = train(
             data=data, name=name, label=label, grid=grid, seeds=seeds,
             base_epochs=base_epochs, score_epochs=score_epochs,
-            batch_size=batch_size, source_class=source_class,
+            batch_size=batch_size, progress_every_batches=progress_every_batches,
+            source_class=source_class,
             prior_width=prior_width, prior_height=prior_height, augment=augment,
         )
         self.__init__(checkpoints[0], device=str(self.device))

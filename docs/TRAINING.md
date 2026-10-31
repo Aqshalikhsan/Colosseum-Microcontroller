@@ -55,7 +55,7 @@ colosseum train --data my_dataset/data.yaml --name my_object \
 
 The script calculates median normalized width and height **from training boxes only**, after applying the same letterbox geometry used by the model. Choose `2x8` for horizontally elongated targets or `4x4` for more balanced shapes. The grid choice should be fixed before evaluating the result. Training uses CUDA when available and otherwise runs on CPU.
 
-The default is one seed, 300 initial epochs and 20 score-alignment epochs. In Python, pass `seeds=(0, 1, 2)`, `base_epochs=300`, `score_epochs=20`, and `batch_size=32` to `model.train(...)` to change these options. The equivalent CLI call is:
+The default is one seed, 300 initial epochs and 20 score-alignment epochs. In Python, pass `seeds=(0, 1, 2)`, `base_epochs=300`, `score_epochs=20`, and `batch_size=32` to `model.train(...)` to change these options. Training prints the current epoch, batch, elapsed time, validation start, and epoch metrics. Set `progress_every_batches=5` in Python or `--progress-every-batches 5` on the CLI for more frequent updates; use `0` to disable batch updates. The equivalent CLI call is:
 
 ```bash
 colosseum train --data my_dataset/data.yaml --name my_object \

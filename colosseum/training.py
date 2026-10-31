@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
 import subprocess
 import sys
+import threading
+import time
 from pathlib import Path
 
 import yaml
@@ -42,7 +45,50 @@ def training_priors(data_file: Path, source_class: int) -> tuple[float, float, i
 
 def run(command: list[str], workdir: Path) -> None:
     print("$ " + " ".join(command), flush=True)
-    subprocess.run(command, cwd=workdir, check=True)
+    env = os.environ.copy()
+    env["PYTHONUNBUFFERED"] = "1"
+    process = subprocess.Popen(
+        command, cwd=workdir, env=env,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True, encoding="utf-8", errors="replace", bufsize=1,
+    )
+    assert process.stdout is not None
+    started = time.monotonic()
+    last_output = [started]
+    stop_heartbeat = threading.Event()
+
+    def heartbeat() -> None:
+        while not stop_heartbeat.wait(60):
+            if process.poll() is None and time.monotonic() - last_output[0] >= 60:
+                print(
+                    f"trainer_alive pid={process.pid} "
+                    f"elapsed={time.monotonic() - started:.0f}s "
+                    f"since_last_output={time.monotonic() - last_output[0]:.0f}s",
+                    flush=True,
+                )
+
+    watcher = threading.Thread(target=heartbeat, daemon=True)
+    watcher.start()
+    try:
+        for line in process.stdout:
+            print(line, end="", flush=True)
+            last_output[0] = time.monotonic()
+        returncode = process.wait()
+    except BaseException:
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+        raise
+    finally:
+        stop_heartbeat.set()
+        watcher.join(timeout=1)
+        process.stdout.close()
+    if returncode:
+        raise subprocess.CalledProcessError(returncode, command)
 
 
 def main(argv: list[str] | None = None) -> list[Path]:
@@ -56,6 +102,8 @@ def main(argv: list[str] | None = None) -> list[Path]:
     parser.add_argument("--base-epochs", type=int, default=300)
     parser.add_argument("--score-epochs", type=int, default=20)
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--progress-every-batches", type=int, default=10,
+                        help="print progress every N batches; 0 disables batch updates")
     parser.add_argument("--source-class", type=int, default=0)
     parser.add_argument("--prior-width", type=float)
     parser.add_argument("--prior-height", type=float)
@@ -68,6 +116,8 @@ def main(argv: list[str] | None = None) -> list[Path]:
         parser.error("--name must use letters, digits, underscores, or hyphens")
     if args.base_epochs < 1 or args.score_epochs < 1 or args.batch_size < 1:
         parser.error("epochs and batch size must be positive")
+    if args.progress_every_batches < 0:
+        parser.error("--progress-every-batches must be nonnegative")
     if len(set(args.seeds)) != len(args.seeds) or any(seed < 0 for seed in args.seeds):
         parser.error("--seeds must contain distinct nonnegative integers")
     if (args.prior_width is None) != (args.prior_height is None):
@@ -91,6 +141,7 @@ def main(argv: list[str] | None = None) -> list[Path]:
         "--output-stride", args.grid, "--geometry-mode", "prior_log",
         "--prior-width", str(prior_width), "--prior-height", str(prior_height),
         "--objectness-mode", "peak", "--batch-size", str(args.batch_size),
+        "--progress-every-batches", str(args.progress_every_batches),
         "--source-class", str(args.source_class),
     ]
     if not args.no_augment:
@@ -145,6 +196,7 @@ def train(
     base_epochs: int = 300,
     score_epochs: int = 20,
     batch_size: int = 32,
+    progress_every_batches: int = 10,
     source_class: int = 0,
     prior_width: float | None = None,
     prior_height: float | None = None,
@@ -156,6 +208,7 @@ def train(
         "--seeds", *(str(seed) for seed in seeds),
         "--base-epochs", str(base_epochs), "--score-epochs", str(score_epochs),
         "--batch-size", str(batch_size), "--source-class", str(source_class),
+        "--progress-every-batches", str(progress_every_batches),
     ]
     if prior_width is not None:
         argv.extend(["--prior-width", str(prior_width)])

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import time
 from pathlib import Path
 
 import torch
@@ -50,6 +51,8 @@ def main() -> None:
     )
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--progress-every-batches", type=int, default=0,
+                        help="print training progress every N batches; 0 disables batch updates")
     parser.add_argument("--height", type=int, default=112)
     parser.add_argument("--width", type=int, default=192)
     parser.add_argument(
@@ -182,6 +185,8 @@ def main() -> None:
         parser.error("--tiny-center-height-pixels must be finite and positive")
     if args.torch_threads < 0:
         parser.error("--torch-threads must be nonnegative")
+    if args.progress_every_batches < 0:
+        parser.error("--progress-every-batches must be nonnegative")
     if args.early_screen_epoch < 0 or args.early_screen_epoch >= args.epochs:
         if args.early_screen_epoch != 0:
             parser.error("--early-screen-epoch must be 0 or below --epochs")
@@ -351,7 +356,8 @@ def main() -> None:
         f"distillation_weight={args.distillation_weight:g} "
         f"logit_distillation_weight={args.logit_distillation_weight:g} "
         f"train_samples={len(dataset)} "
-        f"val_samples={len(validation_dataset)}"
+        f"val_samples={len(validation_dataset)}",
+        flush=True,
     )
 
     best_ap50 = -1.0
@@ -365,12 +371,15 @@ def main() -> None:
         print(f"resumed={args.resume} next_epoch={start_epoch} best_ap50={best_ap50:.6f}", flush=True)
         del resumed
     for epoch in range(start_epoch, args.epochs + 1):
+        epoch_started = time.monotonic()
+        if args.progress_every_batches:
+            print(f"epoch_start={epoch:03d}/{args.epochs} batches={len(loader)}", flush=True)
         current_lr = learning_rate_at(epoch)
         for group in optimizer.param_groups:
             group["lr"] = current_lr
         model.train()
         running = 0.0
-        for batch in loader:
+        for batch_index, batch in enumerate(loader, start=1):
             images, labels = batch[0], batch[1]
             teacher = batch[2] if len(batch) > 2 else None
             device_images = images.to(device)
@@ -411,6 +420,19 @@ def main() -> None:
             if thermal_check is not None:
                 thermal_check()
             running += float(losses["loss"].detach())
+            if args.progress_every_batches and (
+                batch_index % args.progress_every_batches == 0 or batch_index == len(loader)
+            ):
+                elapsed = time.monotonic() - epoch_started
+                print(
+                    f"epoch_progress={epoch:03d}/{args.epochs} "
+                    f"batch={batch_index}/{len(loader)} "
+                    f"elapsed={elapsed:.1f}s "
+                    f"train_eta={elapsed * (len(loader) - batch_index) / batch_index:.1f}s",
+                    flush=True,
+                )
+        if args.progress_every_batches:
+            print(f"epoch_validation={epoch:03d}/{args.epochs} batches={len(validation_loader)}", flush=True)
         metrics = evaluate_model(
             model,
             validation_loader,
@@ -423,7 +445,8 @@ def main() -> None:
             f"epoch={epoch:03d} loss={running / len(loader):.6f} "
             f"lr={current_lr:.6f} "
             f"ap50={metrics.ap50:.4f} precision={metrics.precision:.4f} "
-            f"recall={metrics.recall:.4f} f1={metrics.f1:.4f}",
+            f"recall={metrics.recall:.4f} f1={metrics.f1:.4f} "
+            f"elapsed={time.monotonic() - epoch_started:.1f}s",
             flush=True,
         )
         def _snapshot() -> dict:
