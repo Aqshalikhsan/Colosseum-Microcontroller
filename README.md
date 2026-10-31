@@ -26,17 +26,14 @@ This repository provides **18 ready-to-use PyTorch checkpoints** (six datasets Ã
 
 ## Quick start
 
-Tested with Python 3.11.
+Tested with Python 3.11. Install the package directly from this repository:
 
 ```bash
-git clone https://github.com/Aqshalikhsan/Colosseum-Microcontroller.git
-cd Colosseum-Microcontroller
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# Linux/macOS: source .venv/bin/activate
-pip install -r requirements.txt
-python predict.py --weights weights/uc3m.pt --source path/to/image.jpg
+python -m pip install git+https://github.com/Aqshalikhsan/Colosseum-Microcontroller.git
+colosseum predict --weights uc3m --source path/to/image.jpg
 ```
+
+The pip package includes all **18 checkpoints**, so a model name such as `uc3m`, `shwd`, or `uc3m_seed1` works without downloading another file. You can also pass a path to your own compact checkpoint. For a source checkout, use `python -m pip install -e .` to install the package in editable mode.
 
 Annotated images and machine-readable `predictions.json` are written to `runs/predict/`. Use `--source path/to/folder` for a folder of images, `--conf 0.25` to adjust the confidence cutoff, and `--device cuda:0` for a CUDA GPU.
 
@@ -45,7 +42,7 @@ Python API:
 ```python
 from colosseum import Colosseum
 
-model = Colosseum("weights/uc3m.pt")
+model = Colosseum("uc3m")
 for box in model.predict("path/to/image.jpg", conf=0.35):
     print(box.label, box.confidence, box.x1, box.y1, box.x2, box.y2)
 ```
@@ -54,7 +51,7 @@ The coordinates are pixels in the original image after EXIF orientation is appli
 
 ## Model zoo
 
-All included weights are **final checkpoints** from the reported three-seed training runs. The top-level weights are seed 0; seed 1 and 2 are in `weights/seeds/`. The complete training state was stripped; each file contains model tensors and the metadata required for inference. The `weights/manifest.json` file records SHA-256 hashes.
+All included weights are **final checkpoints** from the reported three-seed training runs. The top-level weights are seed 0; seed 1 and 2 are in `weights/seeds/`. They are also bundled with the pip package. The complete training state was stripped; each file contains model tensors and the metadata required for inference. The `weights/manifest.json` file records SHA-256 hashes.
 
 | Weights | Training dataset | Detects | Output stride |
 |---|---|---|---|
@@ -90,8 +87,8 @@ The following paper figure shows selected **validation examples**, not aggregate
 Colosseum uses YOLO-format single-class annotations. For a new dataset, put images and labels in `images/train`, `images/val`, `labels/train`, and `labels/val`, then make a `data.yaml`. One command trains both stages and packages weights:
 
 ```bash
-python train.py --data my_dataset/data.yaml --name my_object --label "my object" --grid 4x4
-python predict.py --weights runs/custom/my_object/seed0/colosseum.pt --source path/to/image.jpg
+colosseum train --data my_dataset/data.yaml --name my_object --label "my object" --grid 4x4
+colosseum predict --weights runs/custom/my_object/seed0/colosseum.pt --source path/to/image.jpg
 ```
 
 The script computes box-size priors from training labels only. Use `--grid 2x8` for elongated horizontal targets, `--seeds 0 1 2` for three runs, and `--source-class N` when the target's YOLO class ID is not zero. See the [full custom-training guide](docs/TRAINING.md) for the dataset layout, options, and manual commands. Raw datasets and official test images are not included here.
@@ -101,7 +98,7 @@ The script computes box-size priors from training labels only. Use `--grid 2x8` 
 - Input: grayscale, bilinear resize preserving aspect ratio, gray padding value 114.
 - Architecture: fixed-gradient stem, regular bottleneck blocks, multiscale fusion, one confidence channel and four geometry channels.
 - Geometry: normalized boxes with a prior-log width and height encoding; priors are saved in each checkpoint.
-- Files under `src/` retain some internal legacy names because they are also used by the training and checkpoint export pipeline. The public model name is Colosseum.
+- The implementation is packaged under `colosseum/`; `src/` keeps compatibility imports for older source-checkout commands.
 
 Please cite the Colosseum paper when it becomes available. The datasets remain subject to their source terms; no raw dataset images are redistributed here.
 

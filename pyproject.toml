@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "colosseum-microcontroller"
+version = "0.1.0"
+description = "Compact single-class object detection for microcontrollers"
+readme = "PYPI_README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Aqshal Nur Ikhsan"}]
+keywords = ["object detection", "microcontroller", "ESP32-S3", "TinyML", "PyTorch"]
+dependencies = [
+    "torch>=2.1",
+    "Pillow>=10",
+    "PyYAML>=6",
+]
+
+[project.scripts]
+colosseum = "colosseum.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Aqshalikhsan/Colosseum-Microcontroller"
+Repository = "https://github.com/Aqshalikhsan/Colosseum-Microcontroller"
+Documentation = "https://github.com/Aqshalikhsan/Colosseum-Microcontroller/blob/main/README.md"
+
+[tool.setuptools.packages.find]
+include = ["colosseum*", "akros*"]
+
+[tool.setuptools.package-data]
+colosseum = ["weights/*.pt", "weights/seeds/*.pt", "weights/manifest.json"]

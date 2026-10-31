@@ -1,5 +1,7 @@
 # Training Colosseum on a new dataset
 
+Install with `python -m pip install git+https://github.com/Aqshalikhsan/Colosseum-Microcontroller.git`. The commands below also work from an editable source checkout (`python -m pip install -e .`).
+
 Colosseum learns **one target class per checkpoint**. You can train it for plates, helmets, signs, or another object type using your own images and YOLO-format box annotations. The quick command below starts from random initialization, trains with a hard score target, continues with IoU-aligned scores, and writes a compact inference checkpoint.
 
 The training script expects ordinary YOLO labels, one line per object:
@@ -30,7 +32,7 @@ names: [object]
 Run from the repository root:
 
 ```bash
-python train.py --data my_dataset/data.yaml --name my_object \
+colosseum train --data my_dataset/data.yaml --name my_object \
   --label "my object" --grid 4x4
 ```
 
@@ -39,7 +41,7 @@ The script calculates median normalized width and height **from training boxes o
 The default is one seed, 300 initial epochs and 20 score-alignment epochs. To run three seeds or change the budget:
 
 ```bash
-python train.py --data my_dataset/data.yaml --name my_object \
+colosseum train --data my_dataset/data.yaml --name my_object \
   --label "my object" --grid 4x4 --seeds 0 1 2 \
   --base-epochs 300 --score-epochs 20 --batch-size 32
 ```
@@ -49,11 +51,13 @@ For a dataset whose target is class 2, add `--source-class 2`. To supply your ow
 Each seed produces `runs/custom/my_object/seedN/colosseum.pt`. For inference:
 
 ```bash
-python predict.py --weights runs/custom/my_object/seed0/colosseum.pt \
+colosseum predict --weights runs/custom/my_object/seed0/colosseum.pt \
   --source path/to/image.jpg
 ```
 
 ## Manual training commands
+
+The manual `src/` and `scripts/` commands below are for a source checkout. The packaged `colosseum train` command above performs both stages and packages the checkpoint automatically.
 
 The commands below expose the underlying two-stage training script. The prior values are **an example for a plate dataset**; estimate them from your own training set or use the quick command above. Use `2x8` for this plate example and change `--task`, `--output-stride`, and the priors as needed.
 

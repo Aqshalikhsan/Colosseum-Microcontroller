@@ -4,12 +4,27 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from pathlib import Path
+import re
 
 import torch
 from PIL import Image, ImageOps
 
-from src.mergdet_m import MergDetM
-from src.platedet_u import GeometryCodec, decode
+from ._core.mergdet_m import MergDetM
+from ._core.platedet_u import GeometryCodec, decode
+
+
+def _resolve_weights(weights: str | Path) -> Path:
+    path = Path(weights)
+    if path.is_file():
+        return path
+    name = str(weights)
+    if re.fullmatch(r"[a-z0-9]+(?:_seed[12])?(?:\.pt)?", name):
+        stem = name.removesuffix(".pt")
+        relative = f"seeds/{stem}.pt" if "_seed" in stem else f"{stem}.pt"
+        bundled = Path(__file__).resolve().parent / "weights" / relative
+        if bundled.is_file():
+            return bundled
+    raise FileNotFoundError(f"Colosseum weights not found: {weights}")
 
 
 @dataclass(frozen=True)
@@ -30,7 +45,7 @@ class Colosseum:
 
     def __init__(self, weights: str | Path, device: str = "cpu") -> None:
         self.device = torch.device(device)
-        checkpoint = torch.load(weights, map_location="cpu", weights_only=True)
+        checkpoint = torch.load(_resolve_weights(weights), map_location="cpu", weights_only=True)
         if checkpoint.get("architecture") not in {"Colosseum", "AKROS"}:
             raise ValueError("Expected a public Colosseum checkpoint")
         self.label = str(checkpoint["label"])
