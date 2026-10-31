@@ -42,6 +42,7 @@ checkpoints = model.train(
     grid="4x4",
 )
 print(checkpoints[0])
+print(model.metrics)  # validation AP50, AP75, AP50:95, precision, recall, F1
 boxes = model.predict("path/to/image.jpg")
 ```
 
@@ -64,7 +65,7 @@ colosseum train --data my_dataset/data.yaml --name my_object \
 
 For a dataset whose target is class 2, add `--source-class 2`. To supply your own priors, pass **both** `--prior-width` and `--prior-height`. For a smaller initial trial, lower `--base-epochs` and `--score-epochs`; that changes the training recipe.
 
-Each seed produces `runs/custom/my_object/seedN/colosseum.pt`. For inference:
+Each seed produces `runs/custom/my_object/seedN/colosseum.pt` and `metrics.json`. AP values use 101-point interpolation at IoU 0.50, 0.75, and the mean from 0.50 through 0.95 in steps of 0.05. Precision, recall, and F1 use confidence threshold 0.35 and IoU 0.50. To evaluate a loaded checkpoint again, call `model.evaluate("my_dataset/data.yaml")`; only the validation split is used. For inference:
 
 ```bash
 colosseum predict --weights runs/custom/my_object/seed0/colosseum.pt \

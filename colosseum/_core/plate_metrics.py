@@ -26,6 +26,8 @@ class DetectionMetrics:
     true_positives: int
     false_positives: int
     false_negatives: int
+    ap75: float | None = None
+    ap50_95: float | None = None
 
 
 def _iou(detection: Detection, target: Tensor) -> float:
@@ -128,8 +130,9 @@ def evaluate_model(
     input_height: int | None = None,
     codec: GeometryCodec | None = None,
     peak_kernel: int | tuple[int, int] = 3,
+    full_ap: bool = False,
 ) -> DetectionMetrics:
-    """Compute AP50 and operating-point metrics in normalized coordinates."""
+    """Compute operating-point metrics and optionally AP across COCO IoU levels."""
 
     model.eval()
     predictions: list[list[Detection]] = []
@@ -152,6 +155,15 @@ def evaluate_model(
         predictions.extend(decoded)
         targets.extend(target.detach().cpu() for target in batch_targets)
     ap_metrics = detection_metrics(predictions, targets)
+    ap75 = None
+    ap50_95 = None
+    if full_ap:
+        ap_values = [ap_metrics.ap50] + [
+            detection_metrics(predictions, targets, iou_threshold=threshold / 100).ap50
+            for threshold in range(55, 100, 5)
+        ]
+        ap75 = ap_values[5]
+        ap50_95 = sum(ap_values) / len(ap_values)
     operating_predictions = [
         [detection for detection in image if detection.score >= score_threshold]
         for image in predictions
@@ -165,4 +177,6 @@ def evaluate_model(
         true_positives=operating_metrics.true_positives,
         false_positives=operating_metrics.false_positives,
         false_negatives=operating_metrics.false_negatives,
+        ap75=ap75,
+        ap50_95=ap50_95,
     )

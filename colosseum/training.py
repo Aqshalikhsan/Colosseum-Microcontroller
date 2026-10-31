@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import statistics
 import subprocess
 import sys
@@ -111,6 +112,24 @@ def main(argv: list[str] | None = None) -> list[Path]:
         run([sys.executable, "-m", "colosseum.pack_checkpoint",
              "--input", str(directory / "final_last.pt"), "--output", str(compact),
              "--label", args.label, "--dataset", args.name], workdir)
+        from .evaluation import evaluate_checkpoint
+
+        metrics = evaluate_checkpoint(
+            compact, data_file, source_class=args.source_class,
+            batch_size=args.batch_size,
+        )
+        metrics_path = directory / "metrics.json"
+        metrics_path.write_text(
+            json.dumps({"seed": seed, **metrics}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(
+            f"validation seed={seed} ap50={metrics['ap50']:.4f} "
+            f"ap75={metrics['ap75']:.4f} ap50_95={metrics['ap50_95']:.4f} "
+            f"precision={metrics['precision']:.4f} recall={metrics['recall']:.4f} "
+            f"f1={metrics['f1']:.4f} metrics={metrics_path}",
+            flush=True,
+        )
         print(f"ready={compact}", flush=True)
         checkpoints.append(compact)
     return checkpoints

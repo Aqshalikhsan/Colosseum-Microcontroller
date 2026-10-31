@@ -19,10 +19,11 @@ checkpoints = model.train(
     grid="4x4",
 )
 print(checkpoints[0])
+print(model.metrics)  # AP50, AP75, AP50:95, precision, recall, F1
 boxes = model.predict("path/to/image.jpg")
 ```
 
-Training starts from scratch, saves a compact checkpoint under `runs/custom/my_object/seed0/`, and loads it for inference. One checkpoint detects one target class. Your dataset uses images and normalized bounding-box text annotations; see the [training guide](https://github.com/Aqshalikhsan/Colosseum-Microcontroller/blob/main/docs/TRAINING.md) for the layout.
+Training starts from scratch, saves a compact checkpoint and `metrics.json` under `runs/custom/my_object/seed0/`, and loads it for inference. Metrics are computed on the validation split. One checkpoint detects one target class. Your dataset uses images and normalized bounding-box text annotations; see the [training guide](https://github.com/Aqshalikhsan/Colosseum-Microcontroller/blob/main/docs/TRAINING.md) for the layout.
 
 The command-line equivalent is:
 

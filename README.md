@@ -45,10 +45,11 @@ checkpoints = model.train(
     grid="4x4",
 )
 print(checkpoints[0])  # runs/custom/my_object/seed0/colosseum.pt
+print(model.metrics)    # AP50, AP75, AP50:95, precision, recall, F1
 boxes = model.predict("path/to/image.jpg")
 ```
 
-This trains the Colosseum network from scratch, loads the resulting checkpoint, and returns its path. Each checkpoint detects **one target class**. The dataset uses ordinary image files and text files with normalized box coordinates; the [training guide](docs/TRAINING.md) shows the exact layout. No Ultralytics package or YOLO model is used. For a source checkout, use `python -m pip install -e .` to install the library in editable mode.
+This trains the Colosseum network from scratch, evaluates the validation split, loads the resulting checkpoint, and returns its path. Each seed writes a `metrics.json` with AP50, AP75, AP50:95, precision, recall, and F1. Call `model.evaluate("my_dataset/data.yaml")` to evaluate a loaded checkpoint again. Each checkpoint detects **one target class**. The dataset uses ordinary image files and text files with normalized box coordinates; the [training guide](docs/TRAINING.md) shows the exact layout. No Ultralytics package or YOLO model is used. For a source checkout, use `python -m pip install -e .` to install the library in editable mode.
 
 The equivalent command-line interface is:
 

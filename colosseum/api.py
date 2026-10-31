@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import json
 from pathlib import Path
 import re
 
@@ -46,9 +47,11 @@ class Colosseum:
     def __init__(self, weights: str | Path | None = None, device: str = "cpu") -> None:
         self.device = torch.device(device)
         self.model = None
+        self.metrics: dict | None = None
         if weights is None:
             return
-        checkpoint = torch.load(_resolve_weights(weights), map_location="cpu", weights_only=True)
+        checkpoint_path = _resolve_weights(weights)
+        checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
         if checkpoint.get("architecture") not in {"Colosseum", "AKROS"}:
             raise ValueError("Expected a public Colosseum checkpoint")
         self.label = str(checkpoint["label"])
@@ -65,6 +68,9 @@ class Colosseum:
             prior_width=float(checkpoint["prior_width"]),
             prior_height=float(checkpoint["prior_height"]),
         )
+        metrics_path = checkpoint_path.with_name("metrics.json")
+        if metrics_path.is_file():
+            self.metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
 
     def train(
         self,
@@ -93,6 +99,21 @@ class Colosseum:
         )
         self.__init__(checkpoints[0], device=str(self.device))
         return checkpoints
+
+    def evaluate(
+        self,
+        data: str | Path,
+        *,
+        source_class: int = 0,
+        batch_size: int = 32,
+    ) -> dict:
+        """Return AP50, AP75, AP50:95, precision, recall and F1 on val."""
+        from .evaluation import evaluate_detector
+
+        self.metrics = evaluate_detector(
+            self, data, source_class=source_class, batch_size=batch_size
+        )
+        return self.metrics
 
     def predict(
         self, source: str | Path | Image.Image,
