@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "colosseum-microcontroller"
-version = "0.1.2"
+version = "0.1.3"
 description = "Train compact single-class object detectors for microcontrollers"
 readme = "PYPI_README.md"
 requires-python = ">=3.11"

@@ -1,6 +1,6 @@
 # Training Colosseum on a new dataset
 
-Install with `python -m pip install git+https://github.com/Aqshalikhsan/Colosseum-Microcontroller.git`. The commands below also work from an editable source checkout (`python -m pip install -e .`).
+Install with `python -m pip install colosseum-microcontroller`. The commands below also work from an editable source checkout (`python -m pip install -e .`). For a ready-to-run interface, use the [Google Colab training notebook](https://colab.research.google.com/github/Aqshalikhsan/Colosseum-Microcontroller/blob/main/notebooks/Train_Colosseum.ipynb).
 
 Colosseum learns **one target class per checkpoint**. You can train it for plates, helmets, signs, or another object type using your own images and box annotations. The Python API starts from random initialization, trains with a hard score target, continues with IoU-aligned scores, and writes a compact inference checkpoint. The label text files use the common YOLO annotation format; the model and training code are Colosseum's own.
 

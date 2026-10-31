@@ -15,6 +15,7 @@
 
 <p align="center">
   <a href="#quick-start">🚀 Quick start</a> &nbsp;·&nbsp;
+  <a href="notebooks/Train_Colosseum.ipynb">📓 Training notebook</a> &nbsp;·&nbsp;
   <a href="#model-zoo">🧠 Models</a> &nbsp;·&nbsp;
   <a href="#benchmarks">📊 Benchmarks</a> &nbsp;·&nbsp;
   <a href="#train-on-your-data">🛠️ Train on your data</a>
@@ -26,11 +27,13 @@ Install Colosseum as a Python library to train a detector on your own images. Th
 
 ## Quick start
 
-Tested with Python 3.11. Install the package directly from this repository:
+Tested with Python 3.11. Install the package from PyPI:
 
 ```bash
-python -m pip install git+https://github.com/Aqshalikhsan/Colosseum-Microcontroller.git
+python -m pip install colosseum-microcontroller
 ```
+
+[Open the training notebook in Google Colab](https://colab.research.google.com/github/Aqshalikhsan/Colosseum-Microcontroller/blob/main/notebooks/Train_Colosseum.ipynb) to upload your own dataset, train through the Python API, view validation metrics, and download the checkpoints.
 
 Create `my_dataset/data.yaml` and train your own detector from Python:
 

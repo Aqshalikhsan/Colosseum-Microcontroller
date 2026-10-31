@@ -32,3 +32,5 @@ colosseum train --data my_dataset/data.yaml --name my_object --label "my object"
 ```
 
 The bundled example names are `uc3m`, `gtsdb`, `shwd`, `ccpd`, `drone`, and `amlpr`, plus `_seed1` and `_seed2` variants. For inference you can pass either one of these names or the path to your own compact checkpoint. See the [repository](https://github.com/Aqshalikhsan/Colosseum-Microcontroller) for benchmarks. The weights are floating-point PyTorch checkpoints; ESP32-S3 deployment uses the separate INT8 runtime.
+
+[Open the training notebook in Google Colab](https://colab.research.google.com/github/Aqshalikhsan/Colosseum-Microcontroller/blob/main/notebooks/Train_Colosseum.ipynb) to upload a dataset and run the full pipeline.
