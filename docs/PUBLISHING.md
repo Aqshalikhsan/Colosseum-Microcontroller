@@ -9,7 +9,7 @@ Before the first PyPI release, register a **pending trusted publisher** on PyPI 
 - Workflow: `publish-pypi.yml`
 - Environment: `pypi`
 
-The workflow in `.github/workflows/publish-pypi.yml` builds a wheel and source distribution and publishes on a GitHub release tagged `v0.1.3`. PyPI uses GitHub's short-lived OIDC identity; no PyPI token is stored in this repository.
+The workflow in `.github/workflows/publish-pypi.yml` builds a wheel and source distribution when a GitHub release with the matching `v<version>` tag is published. PyPI uses GitHub's short-lived OIDC identity; no PyPI token is stored in this repository.
 
 To test locally before a release:
 

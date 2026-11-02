@@ -192,8 +192,6 @@ def main() -> None:
             parser.error("--early-screen-epoch must be 0 or below --epochs")
     if not math.isfinite(args.early_screen_min_ap50) or not 0 <= args.early_screen_min_ap50 <= 1:
         parser.error("--early-screen-min-ap50 must lie in [0, 1]")
-    if args.resume and args.init_checkpoint:
-        parser.error("--resume and --init-checkpoint are mutually exclusive")
     if not math.isfinite(args.logit_distillation_weight) or args.logit_distillation_weight < 0:
         parser.error("--logit-distillation-weight must be finite and nonnegative")
     if not math.isfinite(args.logit_distillation_geometry_weight) or args.logit_distillation_geometry_weight < 0:
@@ -304,7 +302,7 @@ def main() -> None:
     if args.thermal_guard and device.type == "cuda":
         from thermal_guard import make_guard
         thermal_check, thermal_state = make_guard()
-    if args.init_checkpoint:
+    if args.init_checkpoint and not args.resume:
         initial = torch.load(args.init_checkpoint, map_location=device, weights_only=True)
         model.load_state_dict(initial["model"])
     optimizer = torch.optim.AdamW(
@@ -441,14 +439,6 @@ def main() -> None:
             top_k=args.val_top_k,
             codec=codec,
         )
-        print(
-            f"epoch={epoch:03d} loss={running / len(loader):.6f} "
-            f"lr={current_lr:.6f} "
-            f"ap50={metrics.ap50:.4f} precision={metrics.precision:.4f} "
-            f"recall={metrics.recall:.4f} f1={metrics.f1:.4f} "
-            f"elapsed={time.monotonic() - epoch_started:.1f}s",
-            flush=True,
-        )
         def _snapshot() -> dict:
             return {
                 "model": {
@@ -538,6 +528,14 @@ def main() -> None:
         # only an untrained checkpoint behind, which makes the failure impossible
         # to diagnose afterwards.
         atomic_save(snapshot, output.with_name(f"{output.stem}_last{output.suffix}"))
+        print(
+            f"epoch={epoch:03d} loss={running / len(loader):.6f} "
+            f"lr={current_lr:.6f} "
+            f"ap50={metrics.ap50:.4f} precision={metrics.precision:.4f} "
+            f"recall={metrics.recall:.4f} f1={metrics.f1:.4f} "
+            f"elapsed={time.monotonic() - epoch_started:.1f}s",
+            flush=True,
+        )
         if epoch == 150:
             atomic_save(snapshot, output.with_name(f"{output.stem}_epoch150{output.suffix}"))
         if (

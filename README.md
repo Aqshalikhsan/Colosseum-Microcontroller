@@ -33,7 +33,7 @@ Tested with Python 3.11. Install the package from PyPI:
 python -m pip install colosseum-microcontroller
 ```
 
-[Open the training notebook in Google Colab](https://colab.research.google.com/github/Aqshalikhsan/Colosseum-Microcontroller/blob/main/notebooks/Train_Colosseum.ipynb) to connect Google Drive, extract a YOLO dataset ZIP (including Roboflow exports), watch live epoch and batch progress, view validation metrics, and save every checkpoint directly to Drive.
+[Open the training notebook in Google Colab](https://colab.research.google.com/github/Aqshalikhsan/Colosseum-Microcontroller/blob/main/notebooks/Train_Colosseum.ipynb) to connect Google Drive, extract a YOLO dataset ZIP (including Roboflow exports), watch live epoch and batch progress, view validation metrics, and save every checkpoint directly to Drive. After a disconnect, rerun the setup cells with the same ZIP and parameters, then use the notebook's **Resume training** cell. The latest complete epoch is restored from `base_last.pt` or `final_last.pt`.
 
 Create `my_dataset/data.yaml` and train your own detector from Python:
 
@@ -52,7 +52,7 @@ print(model.metrics)    # AP50, AP75, AP50:95, precision, recall, F1
 boxes = model.predict("path/to/image.jpg")
 ```
 
-This trains the Colosseum network from scratch, evaluates the validation split, loads the resulting checkpoint, and returns its path. Each seed writes a `metrics.json` with AP50, AP75, AP50:95, precision, recall, and F1. Call `model.evaluate("my_dataset/data.yaml")` to evaluate a loaded checkpoint again. Each checkpoint detects **one target class**. The dataset uses ordinary image files and text files with normalized box coordinates; the [training guide](docs/TRAINING.md) shows the exact layout. No Ultralytics package or YOLO model is used. For a source checkout, use `python -m pip install -e .` to install the library in editable mode.
+This trains the Colosseum network from scratch, evaluates the validation split, loads the resulting checkpoint, and returns its path. Each seed writes a `metrics.json` with AP50, AP75, AP50:95, precision, recall, and F1. The output folder also contains YOLO-style `args.yaml`, per-epoch `results.csv`, `results.png`, and `weights/best.pt` and `weights/last.pt`. `weights/best.pt` is a compact inference checkpoint from the best final-stage epoch; `weights/last.pt` is the latest full training checkpoint. The returned `colosseum.pt` is a compact inference checkpoint from the last epoch. To continue an interrupted run in Python, call `model.train(...)` with the same arguments and `resume=True`. Call `model.evaluate("my_dataset/data.yaml")` to evaluate a loaded checkpoint again. Each checkpoint detects **one target class**. The dataset uses ordinary image files and text files with normalized box coordinates; the [training guide](docs/TRAINING.md) shows the exact layout. No Ultralytics package or YOLO model is used. For a source checkout, use `python -m pip install -e .` to install the library in editable mode.
 
 The equivalent command-line interface is:
 

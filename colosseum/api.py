@@ -88,8 +88,9 @@ class Colosseum:
         prior_width: float | None = None,
         prior_height: float | None = None,
         augment: bool = True,
+        resume: bool = False,
     ) -> list[Path]:
-        """Train from scratch, load the first seed, and return checkpoint paths."""
+        """Train or resume, load the first seed, and return checkpoint paths."""
         from .training import train
 
         checkpoints = train(
@@ -98,6 +99,7 @@ class Colosseum:
             batch_size=batch_size, progress_every_batches=progress_every_batches,
             source_class=source_class,
             prior_width=prior_width, prior_height=prior_height, augment=augment,
+            resume=resume,
         )
         self.__init__(checkpoints[0], device=str(self.device))
         return checkpoints
