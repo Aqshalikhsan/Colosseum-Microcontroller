@@ -35,6 +35,8 @@ python -m pip install colosseum-microcontroller
 
 [Open the training notebook in Google Colab](https://colab.research.google.com/github/Aqshalikhsan/Colosseum-Microcontroller/blob/main/notebooks/Train_Colosseum.ipynb) to connect Google Drive, extract a YOLO dataset ZIP (including Roboflow exports), watch live epoch and batch progress, view validation metrics, and save every checkpoint directly to Drive. After a disconnect, rerun the setup cells with the same ZIP and parameters, then use the notebook's **Resume training** cell. The latest complete epoch is restored from `base_last.pt` or `final_last.pt`.
 
+To inspect an existing run without retraining, open the notebook's **Read saved validation metrics** or **Try a saved `.pt` on an image in Google Drive** cell. Set the run folder, checkpoint path, and image path to files in your Drive. The prediction cell also accepts a full training checkpoint such as `base_last.pt` and saves an annotated image to Drive.
+
 Create `my_dataset/data.yaml` and train your own detector from Python:
 
 ```python
